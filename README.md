@@ -7,7 +7,11 @@ Prepared by:
 - Surushti Mahida
 - Anuhya Evangeline
 
+Backend: Node.js/Express
+
 IDE: Visual Studio Code
+
+Database: MongoDB
 
 APIs: Postman
 
