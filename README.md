@@ -7,7 +7,9 @@ Prepared by:
 - Surushti Mahida
 - Anuhya Evangeline
 
-Backend: Node.js/Express
+Backend: Node.js
+
+Frontend: React.js
 
 IDE: Visual Studio Code
 
