@@ -23,10 +23,24 @@ router.get('/user-input-collection', async (req, res) => {
     }
 });
 
+router.post('/add-condition', async (req, res) => {
+    try {
+        const { name, symptoms } = req.body;
+        if (!name || !symptoms || symptoms.length === 0) {
+            return res.status(400).json({ message: 'Please provide both name and symptoms.' });
+        }
+        const condition = new Condition({ name, symptoms });
+        await condition.save();
+        res.status(201).json(condition);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
 router.post('/data-analysis', async (req, res) => {
     try {
         const { symptoms } = req.body;
-        const conditions = await MedicalCondition.find({
+        const conditions = await Condition.find({
             symptoms: { $in: symptoms }
         });
         if (conditions.length === 0) {
