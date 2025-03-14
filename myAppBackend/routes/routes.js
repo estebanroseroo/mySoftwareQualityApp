@@ -100,4 +100,19 @@ router.post('/risk-based-recommendations', async (req, res) => {
     }
 });
 
+router.post('/continuous-learning', async (req, res) => {
+    try {
+        const { conditionId, userId, helpful, comment } = req.body;
+        const condition = await Condition.findById(conditionId);
+        if (!condition) {
+            return res.status(404).json({ message: 'Condition not found' });
+        }
+        condition.feedback.push({ userId, helpful, comment });
+        await condition.save();
+        res.status(200).json({ message: 'Feedback submitted successfully' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
 module.exports = router;
