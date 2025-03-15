@@ -11,6 +11,15 @@ const App = () => {
         symptoms: []
     });
 
+    const [selectedUser, setSelectedUser] = useState({
+        name: '',
+        age: '',
+        sex: '',
+        symptoms: []
+    });
+
+    const [conditions, setConditions] = useState([]); 
+
     useEffect(() => {
         axios.get('http://localhost:5000/api/myApp/user-input-collection')
             .then(response => setUsers(response.data))
@@ -41,9 +50,41 @@ const App = () => {
             .catch(error => console.log(error));
     };
 
+    const handleSelectUser = (selectedUser) => {
+        setSelectedUser({
+            id: selectedUser._id,
+            name: selectedUser.name,
+            age: selectedUser.age,
+            sex: selectedUser.sex,
+            symptoms: selectedUser.symptoms
+        });
+    };
+
+    const handleDataAnalysis = () => {
+        if (!selectedUser.id) {
+            alert("Please select a user.");
+            return;
+        }
+        axios.post('http://localhost:5000/api/myApp/data-analysis', {
+            userId: selectedUser.id,
+            symptoms: selectedUser.symptoms
+        })
+        .then(response => {
+            if (response.status === 200 && response.data.conditions.length > 0) {
+                setConditions(response.data.conditions);
+            } else {
+                setConditions([]);
+            }
+        })
+        .catch(error => {
+            setConditions([]);
+            console.log(error);
+        })
+    };
+
     return (
         <div>
-            <h1>User Input Collection</h1>
+            <h2>User Input Collection</h2>
             <form onSubmit={handleUserInputSubmit}>
                 <input
                     type="text"
@@ -76,12 +117,45 @@ const App = () => {
                 <button type="submit">Submit</button>
             </form>
 
-            <h2>Submitted User Inputs</h2>
+            <h2>Select a User</h2>
             <ul>
                 {users.map(user => (
-                    <li key={user._id}>{user.name} - {user.age} - {user.sex} - Symptoms: {user.symptoms.join(', ')}</li>
+                    <li key={user._id}>
+                        {user.name} - {user.age} - {user.sex} - Symptoms: {user.symptoms.join(', ')}
+                        <button onClick={() => handleSelectUser(user)}>Select</button>
+                    </li>
                 ))}
             </ul>
+
+            <h2>Selected User Details</h2>
+            <input
+                type="text"
+                name="name"
+                placeholder="Name"
+                value={selectedUser.name}
+                readOnly
+            />
+            <input
+                type="text"
+                name="symptoms"
+                placeholder="Symptoms"
+                value={selectedUser.symptoms.join(', ')}
+                readOnly
+            />
+            <button onClick={handleDataAnalysis}>Analyze Symptoms</button>
+
+            <h2>Data Analysis Results</h2>
+            {conditions.length > 0 ? (
+                <ul>
+                    {conditions.map(condition => (
+                        <li key={condition._id}>
+                            {condition.name} - Symptoms: {condition.symptoms.join(', ')}
+                        </li>
+                    ))}
+                </ul>
+            ) : (
+                <p>No conditions found.</p>
+            )}
         </div>
     );
 };
