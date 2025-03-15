@@ -24,6 +24,10 @@ const App = () => {
     const [recommendations, setRecommendations] = useState([]);
     const [clinics, setClinics] = useState([]);
     const [risk, setRiskLevel] = useState('');
+    const [feedback, setFeedback] = useState({
+        helpful: '',
+        comment: ''
+    });
 
     useEffect(() => {
         axios.get('http://localhost:5000/api/myApp/user-input-collection')
@@ -131,6 +135,41 @@ const App = () => {
         });
     };
 
+    const handleFeedbackChange = (e) => {
+        const { name, value } = e.target;
+        setFeedback({
+            ...feedback,
+            [name]: value
+        });
+    };
+    
+    const handleFeedbackSubmit = (e) => {
+        e.preventDefault();
+        if (!selectedCondition.id) {
+            alert("Please select a condition.");
+            return;
+        }
+        axios.post('http://localhost:5000/api/myApp/continuous-learning', {
+            conditionId: selectedCondition.id,
+            userId: selectedUser.id,
+            helpful: feedback.helpful,
+            comment: feedback.comment
+        })
+        .then(response => {
+            alert('Feedback submitted successfully!');
+            setFeedback({ helpful: '', comment: '' });
+            setConditions([]);
+            setRecommendations([]);
+            setClinics([]);
+            setRiskLevel(''); 
+            setSelectedCondition({ conditionId: '', age: '', symptoms: [] });
+        })
+        .catch(error => {
+            console.log(error);
+            alert('Error submitting feedback.');
+        });
+    };  
+
     return (
         <div>
             <h2>User Input Collection</h2>
@@ -218,7 +257,6 @@ const App = () => {
             <button onClick={handleRiskBasedRecommendations}>Get Recommendations</button>
 
             <h2>Risk-based Recommendations</h2>
-
             {recommendations.length > 0 ? (
                 <>
                     <p>Risk Level: {risk}</p>
@@ -231,7 +269,6 @@ const App = () => {
             ) : (
                 <p>No recommendations available.</p>
             )}
-
             {clinics.length > 0 ? (
                 <ul>
                     {clinics.map((clinic, index) => (
@@ -241,6 +278,37 @@ const App = () => {
             ) : (
                 <p>No clinics available.</p>
             )}
+
+            <h2>Continuous Learning</h2>
+            <>
+                <form onSubmit={handleFeedbackSubmit}>
+                    <div>
+                        <label>
+                            Helpful:
+                            <select
+                                name="helpful"
+                                value={feedback.helpful}
+                                onChange={handleFeedbackChange}
+                            >
+                                <option value="">Select</option>
+                                <option value="yes">Yes</option>
+                                <option value="no">No</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div>
+                        <label>
+                            Comment:
+                            <textarea
+                                name="comment"
+                                value={feedback.comment}
+                                onChange={handleFeedbackChange}
+                            />
+                        </label>
+                    </div>
+                    <button type="submit">Submit Feedback</button>
+                </form>
+            </>
         </div>
     );
 };
