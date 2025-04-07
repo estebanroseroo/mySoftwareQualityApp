@@ -15,6 +15,19 @@ router.post('/user-input-collection', async (req, res) => {
     }
 });
 
+router.delete('/user-input-collection/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const deletedSymptom = await Symptom.findByIdAndDelete(id);
+        if (!deletedSymptom) {
+            return res.status(404).json({ message: 'Symptom entry not found.' });
+        }
+        res.status(200).json({ message: 'Symptom deleted successfully.' });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
 router.get('/user-input-collection', async (req, res) => {
     try {
         const entries = await Symptom.find();
@@ -55,16 +68,20 @@ router.post('/data-analysis', async (req, res) => {
 
 router.post('/risk-based-recommendations', async (req, res) => {
     try {
-        const { conditionId, age, symptoms } = req.body;
+        const { conditionId, age, sex, symptoms } = req.body;
         const condition = await Condition.findById(conditionId);
         if (!condition) {
             return res.status(404).json({ message: 'Condition not found.' });
         }
         let riskLevel = 'low';
-        if (age > 60 || symptoms.length > 3) {
+        if ((age > 65 && sex === 'Man') || (age > 70 && sex === 'Woman') || symptoms.length > 5) {
             riskLevel = 'high';
-        } else if (symptoms.length >= 2) {
+        } else if ((age > 45 && sex === 'Man') || (age > 50 && sex === 'Woman') || symptoms.length > 3) {
             riskLevel = 'medium';
+        }
+        const existingRecommendation = await Recommendation.findOne({ conditionId, riskLevel });
+        if (existingRecommendation) {
+            return res.status(200).json({ recommendation: existingRecommendation });
         }
         let recommendations = [];
         let clinics = ["Clinic Kitchener - 28 Westmount St", "Clinic Waterloo - 395 King St"];
@@ -86,6 +103,7 @@ router.post('/risk-based-recommendations', async (req, res) => {
                 "Monitor symptoms and consult a doctor if symptoms worsen",
                 "Maintain a healthy lifestyle"
             ];
+            clinics = [];
         }
         const recommendation = new Recommendation({
             conditionId,
