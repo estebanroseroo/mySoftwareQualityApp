@@ -18,10 +18,12 @@ APIs: Postman (Unit Testing)
 Repository: GitHub
 
 Steps to run the program:
+
 Terminal 1
 - cd mySoftwareQualityApp
 - cd myAppBackend
 - node server.js
+
 Terminal 2
 - cd mySoftwareQualityApp
 - cd myappfrontend
