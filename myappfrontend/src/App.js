@@ -248,7 +248,7 @@ const App = () => {
     return (
         <div className="container">
             <div className="header">
-                <h1 className="centered-title">AI SYMPTOM TRACKER</h1>
+                <h1 className="centered-title">SYMPTOM TRACKER</h1>
             </div>
             <div className="section">
                 <h2>USER INPUT COLLECTION</h2>
