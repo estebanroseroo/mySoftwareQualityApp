@@ -1,6 +1,4 @@
-# mySoftwareQualityApp
-
-AI SYMPTOM TRACKER
+# SYMPTOM TRACKER
 
 Prepared by:
 - Esteban Rosero	
@@ -13,8 +11,8 @@ Frontend: React.js
 
 IDE: Visual Studio Code
 
-Database: MongoDB
+Database: MongoDB Atlas
 
-APIs: Postman
+APIs: Postman (Unit Testing)
 
 Repository: GitHub
